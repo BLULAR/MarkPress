@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarkPress | Le Viewer Markdown Moderne & Robuste</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1976D2;
+            --primary-dark: #1565C0;
+            --bg: #F8F9FA;
+            --text: #212121;
+            --text-light: #757575;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text);
+            background-color: var(--bg);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Header --- */
+        header {
+            padding: 40px 0;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -1px;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .btn-download {
+            display: inline-block;
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 18px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);
+        }
+
+        .btn-download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
+            background-color: var(--primary-dark);
+        }
+
+        .version {
+            display: block;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* --- Features Grid --- */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            padding: 40px 0;
+        }
+
+        .feature-card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card h3 {
+            color: var(--primary);
+            margin-top: 0;
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .badge-new {
+            background: #4CAF50;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            vertical-align: middle;
+            margin-left: 5px;
+            text-transform: uppercase;
+        }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 60px 0;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate {
+            animation: fadeIn 0.8s ease forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container animate">
+            <h1 class="logo">MarkPress</h1>
+            <p class="tagline">Le viewer Markdown qui ne vous lâche jamais.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero animate" style="animation-delay: 0.2s;">
+            <h2>Visualisez. Exportez. Sans crash.</h2>
+            <p>Un outil léger pour Windows, conçu pour la lisibilité et la robustesse des exports PDF.</p>
+            
+            <a href="https://github.com/BLULAR/MarkPress" class="btn-download">
+                Télécharger MarkPress pour Windows
+            </a>
+            <span class="version">Version 1.0.0 | Gratuit & Open Source</span>
+        </section>
+
+        <section class="features animate" style="animation-delay: 0.4s;">
+            <div class="feature-card">
+                <h3>🚀 Export PDF Intelligent <span class="badge-new">Unique</span></h3>
+                <p>Grâce au système de "Smart Chunking", MarkPress exporte des fichiers massifs (manifests Kubernetes, logs) sans aucun crash de rendu. Fini les pages blanches.</p>
+            </div>
+            <div class="feature-card">
+                <h3>🎨 Material 3 & Fluide</h3>
+                <p>Une interface moderne avec des polices Google Fonts (Poppins, Fira Code) et des animations fluides pour un confort de lecture optimal.</p>
+            </div>
+            <div class="feature-card">
+                <h3>🔒 Confidentialité Totale</h3>
+                <p>MarkPress fonctionne 100% hors-ligne. Vos documents ne transitent jamais par un serveur. Vos données restent les vôtres.</p>
+            </div>
+            <div class="feature-card">
+                <h3>🛠️ Taillé pour les Devs</h3>
+                <p>Support complet du GitHub Flavored Markdown (tables, code blocks, tâches) avec une colorisation syntaxique élégante.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="animate" style="animation-delay: 0.6s;">
+        <p>Créé par <strong>SergeT</strong> avec Flutter</p>
+        <p>
+            <a href="https://github.com/BLULAR/MarkPress">Code Source sur GitHub</a> | 
+            <a href="https://github.com/BLULAR/MarkPress/issues">Signaler un bug</a>
+        </p>
+    </footer>
+
+</body>
+</html>

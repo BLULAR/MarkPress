@@ -1,0 +1,15 @@
+{
+    "appTitle": "MarkPress",
+    "actionOpen": "Ouvrir Fichiers",
+    "actionExport": "Exporter PDF",
+    "actionInfo": "À propos",
+    "actionLanguage": "Langue",
+    "tabWelcome": "Bienvenue",
+    "msgSavedTo": "Enregistré sous {path}",
+    "msgErrorOpen": "Erreur à l'ouverture : {error}",
+    "msgErrorExport": "Erreur d'exportation PDF : {error}",
+    "labelPath": "Chemin : {path}",
+    "aboutDev": "Développé par SergeT",
+    "aboutDesc": "MarkPress est un visualiseur Markdown moderne et léger pour ordinateur. Consultez plusieurs fichiers dans des onglets, naviguez facilement et exportez vos documents en PDF de haute qualité.",
+    "welcomeContent": "# Bienvenue sur MarkPress\n\nCliquez sur l'icône **dossier** en haut à droite pour ouvrir des fichiers `.md`.\n\n## Fonctionnalités\n- **Support multi-onglets**\n- **Export vers PDF** (Moteur MarkPress)\n- **Multi-langue**\n- Interface simple et rapide"
+}

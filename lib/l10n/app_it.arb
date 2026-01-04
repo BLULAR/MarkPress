@@ -1,0 +1,15 @@
+{
+    "appTitle": "MarkPress",
+    "actionOpen": "Apri file",
+    "actionExport": "Esporta PDF",
+    "actionInfo": "Informazioni",
+    "actionLanguage": "Lingua",
+    "tabWelcome": "Benvenuto",
+    "msgSavedTo": "Salvato in {path}",
+    "msgErrorOpen": "Errore durante l apertura: {error}",
+    "msgErrorExport": "Errore durante l esportazione: {error}",
+    "labelPath": "Percorso: {path}",
+    "aboutDev": "Sviluppato da SergeT",
+    "aboutDesc": "MarkPress è un visualizzatore Markdown moderno e leggero per desktop. Visualizza più file in schede, naviga facilmente ed esporta i tuoi documenti in PDF di alta qualità.",
+    "welcomeContent": "# Benvenuto in MarkPress\n\nClicca sull icona della **cartella** in alto a destra per aprire i file `.md`.\n\n## Caratteristiche\n- **Supporto multi-scheda**\n- **Esportazione PDF** (Motore MarkPress)\n- **Multilingua**\n- Interfaccia semplice e veloce"
+}

@@ -1,47 +1,67 @@
-# Markdown Viewer (Flutter)
+# MarkPress
 
-Une application simple pour visualiser des fichiers Markdown sur Windows (et autres plateformes), développée avec **Flutter**.
+**MarkPress** is a modern, lightweight, and powerful Markdown viewer for Windows built with Flutter. It allows you to view multiple Markdown files in tabs, navigate seamlessly, and export your documents to high-quality PDFs with a single click.
 
-## Prérequis
+![MarkPress Logo](logo/mdviewer32x32.jpg)
 
-1.  **Installer Flutter** : Suivez les instructions officielles pour installer le SDK Flutter sur votre machine : [https://flutter.dev/docs/get-started/install/windows](https://flutter.dev/docs/get-started/install/windows).
-2.  Assurez-vous que la commande `flutter doctor` ne signale aucun problème critique.
+## ✨ Features
 
-## Initialisation du projet
+*   **🗂️ Multi-Tab Interface**: Open and manage multiple `.md` files simultaneously in a browser-like tabbed interface.
+*   **📄 Professional PDF Export**: Convert your Markdown notes into beautifully formatted PDF documents.
+*   **🌍 Multi-Language Support**: Fully localized in English, French, German, Italian, and Spanish.
+*   **🎨 Modern Design**: Built with Material 3 and `FlexColorScheme` for a polished, native Windows 11 feel.
+*   **🚀 Fast & Lightweight**: optimized for desktop performance.
+*   **🔒 Secure**: Safe link handling and local file processing (no cloud dependencies).
 
-Comme je n'ai fourni que le code source Dart et la configuration, vous devez générer les fichiers spécifiques à votre plateforme (Windows) :
+## 🚀 Getting Started
 
-1.  Ouvrez une invite de commande (terminal) dans ce dossier.
-2.  Lancez la commande suivante pour télécharger les dépendances et générer les dossiers `windows`, `android`, `ios`, etc. :
+### Prerequisites
 
+*   [Flutter SDK](https://flutter.dev/docs/get-started/install/windows)
+*   Visual Studio (with C++ desktop development workload) for Windows build support.
+
+### Installation & Run
+
+1.  **Clone the repository:**
     ```bash
-    flutter create .
+    git clone https://github.com/YOUR_USERNAME/markpress.git
+    cd markpress
     ```
 
-3.  Installez les paquets listés dans `pubspec.yaml` :
-
+2.  **Install dependencies:**
     ```bash
     flutter pub get
     ```
 
-## Lancement de l'application
+3.  **Run the application:**
+    ```bash
+    flutter run -d windows
+    ```
 
-Pour lancer l'application en mode développement sur Windows :
+### Building the Installer
 
-```bash
-flutter run -d windows
-```
+To create a standalone `.exe` installer for distribution:
 
-*(Note : La première compilation peut prendre un certain temps)*
-
-## Créer un exécutable (.exe)
-
-Pour construire l'application finale optimisée pour la distribution :
-
-1.  Lancez la commande :
-
+1.  Build the release version:
     ```bash
     flutter build windows
     ```
+2.  Open `installers/markpress_setup.iss` with **Inno Setup**.
+3.  Click **Run** to generate the installer in the `installers/` folder.
 
-2.  L'exécutable se trouvera dans `build/windows/runner/Release/`.
+## 🛠️ Built With
+
+*   **Flutter** - UI Toolkit
+*   **flutter_markdown** - Markdown rendering
+*   **printing** & **pdf** - PDF generation
+*   **flex_color_scheme** - Theming
+*   **flutter_animate** - Animations
+*   **shared_preferences** - Local settings storage
+
+## 📄 License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Developer
+
+Developed by **SergeT**.

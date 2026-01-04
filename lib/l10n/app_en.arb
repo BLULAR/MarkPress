@@ -1,0 +1,35 @@
+{
+    "appTitle": "MarkPress",
+    "actionOpen": "Open Files",
+    "actionExport": "Export PDF",
+    "actionInfo": "About",
+    "actionLanguage": "Language",
+    "tabWelcome": "Welcome",
+    "msgSavedTo": "Saved to {path}",
+    "@msgSavedTo": {
+        "placeholders": {
+            "path": {}
+        }
+    },
+    "msgErrorOpen": "Error opening file: {error}",
+    "@msgErrorOpen": {
+        "placeholders": {
+            "error": {}
+        }
+    },
+    "msgErrorExport": "Error exporting PDF: {error}",
+    "@msgErrorExport": {
+        "placeholders": {
+            "error": {}
+        }
+    },
+    "labelPath": "Path: {path}",
+    "@labelPath": {
+        "placeholders": {
+            "path": {}
+        }
+    },
+    "aboutDev": "Developed by SergeT",
+    "aboutDesc": "MarkPress is a modern, lightweight Markdown viewer for desktop. View multiple files in tabs, navigate with ease, and export your documents to high-quality PDFs.",
+    "welcomeContent": "# Welcome to MarkPress\n\nClick the **folder icon** in the top right to open `.md` files.\n\n## Features\n- **Multi-tabs support**\n- **Export to PDF** (MarkPress engine)\n- **Multi-language** support\n- Simple and fast interface"
+}
