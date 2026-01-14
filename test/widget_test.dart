@@ -1,23 +1,23 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:markdown_viewer/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  testWidgets('MarkdownViewerApp smoke test', (WidgetTester tester) async {
+  testWidgets('MarkPressApp smoke test', (WidgetTester tester) async {
+    // Mock SharedPreferences
+    SharedPreferences.setMockInitialValues({});
+    
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MarkdownViewerApp());
+    await tester.pumpWidget(const MarkPressApp());
+    
+    // Wait for animations and async localizations to settle
+    await tester.pumpAndSettle();
 
     // Verify that the app title is present.
-    expect(find.text('Markdown Viewer'), findsOneWidget);
+    // It might appear in the AppBar and potentially in the welcome content.
+    expect(find.text('MarkPress'), findsWidgets);
     
-    // Verify that the initial welcome text is present.
-    expect(find.text('Welcome to Markdown Viewer'), findsOneWidget);
+    // Verify that the initial welcome tab/content is present.
+    expect(find.textContaining('Welcome'), findsWidgets);
   });
 }

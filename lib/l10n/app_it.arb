@@ -11,5 +11,6 @@
     "labelPath": "Percorso: {path}",
     "aboutDev": "Sviluppato da SergeT",
     "aboutDesc": "MarkPress è un visualizzatore Markdown moderno e leggero per desktop. Visualizza più file in schede, naviga facilmente ed esporta i tuoi documenti in PDF di alta qualità.",
-    "welcomeContent": "# Benvenuto in MarkPress\n\nClicca sull icona della **cartella** in alto a destra per aprire i file `.md`.\n\n## Caratteristiche\n- **Supporto multi-scheda**\n- **Esportazione PDF** (Motore MarkPress)\n- **Multilingua**\n- Interfaccia semplice e veloce"
+    "welcomeContent": "# Benvenuto in MarkPress\n\nClicca sull icona della **cartella** in alto a destra per aprire i file `.md`.\n\n## Caratteristiche\n- **Supporto multi-scheda**\n- **Esportazione PDF** (Motore MarkPress)\n- **Multilingua**\n- Interfaccia semplice e veloce",
+    "msgCopiedToClipboard": "Copiato negli appunti"
 }

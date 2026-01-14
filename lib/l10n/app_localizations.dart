@@ -181,6 +181,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'# Welcome to MarkPress\n\nClick the **folder icon** in the top right to open `.md` files.\n\n## Features\n- **Multi-tabs support**\n- **Export to PDF** (MarkPress engine)\n- **Multi-language** support\n- Simple and fast interface'**
   String get welcomeContent;
+
+  /// No description provided for @msgCopiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get msgCopiedToClipboard;
 }
 
 class _AppLocalizationsDelegate

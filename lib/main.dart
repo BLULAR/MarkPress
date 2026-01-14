@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:file_picker/file_picker.dart';
@@ -14,8 +15,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'l10n/app_localizations.dart';
 import 'pdf_exporter.dart';
 
-void main() {
-  runApp(const MarkPressApp());
+void main(List<String> args) {
+  runApp(MarkPressApp(initialArgs: args));
 }
 
 class MarkdownFile {
@@ -27,7 +28,8 @@ class MarkdownFile {
 }
 
 class MarkPressApp extends StatefulWidget {
-  const MarkPressApp({super.key});
+  final List<String> initialArgs;
+  const MarkPressApp({super.key, this.initialArgs = const []});
 
   @override
   State<MarkPressApp> createState() => _MarkPressAppState();
@@ -131,14 +133,18 @@ class _MarkPressAppState extends State<MarkPressApp> {
         fontFamily: GoogleFonts.notoSans().fontFamily,
       ),
       themeMode: ThemeMode.system,
-      home: ViewerPage(onLanguageChanged: _changeLanguage),
+      home: ViewerPage(
+        onLanguageChanged: _changeLanguage,
+        initialFile: widget.initialArgs.isNotEmpty ? widget.initialArgs.first : null,
+      ),
     );
   }
 }
 
 class ViewerPage extends StatefulWidget {
   final Function(Locale) onLanguageChanged;
-  const ViewerPage({super.key, required this.onLanguageChanged});
+  final String? initialFile;
+  const ViewerPage({super.key, required this.onLanguageChanged, this.initialFile});
 
   @override
   State<ViewerPage> createState() => _ViewerPageState();
@@ -151,6 +157,7 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
   final List<MarkdownFile> _openedFiles = [];
   int _activeTabIndex = 0;
   late TabController _tabController;
+  bool _isControllerInit = false;
   
   bool _isInit = false;
 
@@ -161,10 +168,16 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
     final l10n = AppLocalizations.of(context)!;
     
     if (!_isInit) {
-      // First initialization
-      _openedFiles.add(MarkdownFile(name: l10n.tabWelcome, content: l10n.welcomeContent));
-      _tabController = TabController(length: _openedFiles.length, vsync: this);
-      _isInit = true;
+      _isInit = true; // Mark as init immediately to prevent loop
+
+      // Handle initial file from "Open With" or args
+      if (widget.initialFile != null && widget.initialFile!.isNotEmpty) {
+        _openInitialFile(widget.initialFile!);
+      } else {
+        // Default welcome tab
+        _openedFiles.add(MarkdownFile(name: l10n.tabWelcome, content: l10n.welcomeContent));
+        _setupTabController();
+      }
     } else {
       // Update welcome tab content if language changed
       // We identify the welcome tab as the one with null path
@@ -181,28 +194,80 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
     }
   }
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+  Future<void> _openInitialFile(String path) async {
+    try {
+      final file = File(path);
+      if (await file.exists()) {
+        final content = await file.readAsString();
+        String fileName = path.split(Platform.pathSeparator).last;
+        if (fileName.contains('.')) {
+            fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+        }
+        
+        setState(() {
+          _openedFiles.add(MarkdownFile(
+            name: fileName,
+            content: content,
+            path: path,
+          ));
+          // Correctly update index and setup controller
+          _activeTabIndex = _openedFiles.length - 1;
+          _setupTabController();
+        });
+      } else {
+         // Fallback if file not found
+         final l10n = AppLocalizations.of(context)!;
+         if (_openedFiles.isEmpty) {
+             _openedFiles.add(MarkdownFile(name: l10n.tabWelcome, content: l10n.welcomeContent));
+             _setupTabController();
+         }
+      }
+    } catch (e) {
+      // Fallback on error
+      if (mounted) {
+         final l10n = AppLocalizations.of(context)!;
+         if (_openedFiles.isEmpty) {
+             _openedFiles.add(MarkdownFile(name: l10n.tabWelcome, content: l10n.welcomeContent));
+             _setupTabController();
+         }
+         
+         // Show error after build
+         WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.msgErrorOpen(e.toString()))),
+            );
+         });
+      }
+    }
   }
 
-  void _updateTabController() {
-    // ignore: unused_local_variable
-    final oldIndex = _tabController.index;
-    _tabController.dispose();
+  void _setupTabController() {
+    if (_isControllerInit) {
+      _tabController.dispose();
+    }
+    
     _tabController = TabController(
       length: _openedFiles.length, 
       vsync: this,
       initialIndex: _activeTabIndex.clamp(0, _openedFiles.length - 1),
     );
+    _isControllerInit = true;
+
     _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) {
-        setState(() {
-          _activeTabIndex = _tabController.index;
-        });
-      }
+      // Always update state to match controller index
+      // This ensures export and UI are always in sync with what is viewed
+      setState(() {
+        _activeTabIndex = _tabController.index;
+      });
     });
+  }
+
+  @override
+  void dispose() {
+    if (_isControllerInit) {
+      _tabController.dispose();
+    }
+    super.dispose();
   }
 
   void _closeTab(int index) {
@@ -213,7 +278,7 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
         _openedFiles.add(MarkdownFile(name: l10n.tabWelcome, content: l10n.welcomeContent));
       }
       _activeTabIndex = _activeTabIndex.clamp(0, _openedFiles.length - 1);
-      _updateTabController();
+      _setupTabController();
     });
   }
 
@@ -254,7 +319,7 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
           setState(() {
             _activeTabIndex = _openedFiles.length - 1;
             _isLoading = false;
-            _updateTabController();
+            _setupTabController();
           });
         }
       }
@@ -271,7 +336,10 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
   }
 
   Future<void> _exportPdf() async {
-    final currentFile = _openedFiles[_activeTabIndex];
+    // Ensure we export the currently viewed tab by using the controller's index
+    final index = _isControllerInit ? _tabController.index : _activeTabIndex;
+    final currentFile = _openedFiles[index.clamp(0, _openedFiles.length - 1)];
+
     try {
       String? outputFile = await FilePicker.platform.saveFile(
         dialogTitle: 'Save PDF',
@@ -322,10 +390,13 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
     // Safety check
     if (_openedFiles.isEmpty) {
         _openedFiles.add(MarkdownFile(name: l10n.tabWelcome, content: l10n.welcomeContent));
-        _updateTabController();
+        _setupTabController();
     }
+    
     _activeTabIndex = _activeTabIndex.clamp(0, _openedFiles.length - 1);
-    final currentFile = _openedFiles[_activeTabIndex];
+    // Use controller index for UI if initialized to prevent flicker/mismatch
+    final int displayIndex = _isControllerInit ? _tabController.index : _activeTabIndex;
+    final currentFile = _openedFiles[displayIndex.clamp(0, _openedFiles.length - 1)];
     
     return Scaffold(
       appBar: AppBar(
@@ -444,11 +515,12 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
                       // Using locale in the key forces rebuild when language changes
                       key: ValueKey(file.name + file.content.length.toString() + l10n.localeName),
                       data: file.content,
-                      selectable: false,
+                      selectable: true,
                       builders: {
                         'h1': _HeaderBuilder(_anchors, _slugify, theme.textTheme.headlineMedium?.copyWith(fontFamily: GoogleFonts.poppins().fontFamily)),
                         'h2': _HeaderBuilder(_anchors, _slugify, theme.textTheme.titleLarge?.copyWith(fontFamily: GoogleFonts.poppins().fontFamily)),
                         'h3': _HeaderBuilder(_anchors, _slugify, theme.textTheme.titleMedium?.copyWith(fontFamily: GoogleFonts.poppins().fontFamily)),
+                        'pre': _CodeElementBuilder(context),
                       },
                       onTapLink: (text, href, title) async {
                         if (href != null) {
@@ -537,6 +609,78 @@ class _HeaderBuilder extends MarkdownElementBuilder {
       content,
       key: key,
       style: textStyle ?? preferredStyle,
+    );
+  }
+}
+
+class _CodeElementBuilder extends MarkdownElementBuilder {
+  final BuildContext context;
+
+  _CodeElementBuilder(this.context);
+
+  @override
+  Widget? visitElement(md.Element element, TextStyle? preferredStyle) {
+    var text = element.textContent;
+    // Remove the last newline that is often added by the parser
+    if (text.endsWith('\n')) {
+      text = text.substring(0, text.length - 1);
+    }
+
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Stack(
+      children: [
+        Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceVariant,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: theme.colorScheme.outlineVariant.withOpacity(0.5)),
+          ),
+          child: SelectableText(
+            text,
+            style: GoogleFonts.firaCode(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontSize: 14,
+              height: 1.5,
+            ),
+          ),
+        ),
+        Positioned(
+          top: 12,
+          right: 8,
+          child: IconButton(
+            icon: const Icon(Icons.content_copy_rounded, size: 18),
+            tooltip: 'Copy code',
+            style: IconButton.styleFrom(
+              backgroundColor: theme.colorScheme.surface.withOpacity(0.5),
+              foregroundColor: theme.colorScheme.primary,
+              hoverColor: theme.colorScheme.primary.withOpacity(0.1),
+            ),
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: text));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      const Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
+                      const SizedBox(width: 8),
+                      Text(AppLocalizations.of(context)?.msgCopiedToClipboard ?? 'Copied!'),
+                    ],
+                  ),
+                  behavior: SnackBarBehavior.floating,
+                  width: 200,
+                  duration: const Duration(milliseconds: 1500),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
