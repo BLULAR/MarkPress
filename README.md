@@ -7,7 +7,8 @@
 ## ✨ Features
 
 *   **🗂️ Multi-Tab Interface**: Open and manage multiple `.md` files simultaneously in a browser-like tabbed interface.
-*   **📄 Professional PDF Export**: Convert your Markdown notes into beautifully formatted PDF documents.
+*   **📊 Mermaid Diagrams**: Render flowcharts, sequence diagrams, and more directly in your Markdown.
+*   **📄 Professional PDF Export**: Convert your Markdown notes into beautifully formatted PDF documents with embedded diagrams.
 *   **🌍 Multi-Language Support**: Fully localized in English, French, German, Italian, and Spanish.
 *   **🎨 Modern Design**: Built with Material 3 and `FlexColorScheme` for a polished, native Windows 11 feel.
 *   **🚀 Fast & Lightweight**: optimized for desktop performance.

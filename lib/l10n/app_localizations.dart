@@ -179,7 +179,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeContent.
   ///
   /// In en, this message translates to:
-  /// **'# Welcome to MarkPress\n\nClick the **folder icon** in the top right to open `.md` files.\n\n## Features\n- **Multi-tabs support**\n- **Export to PDF** (MarkPress engine)\n- **Multi-language** support\n- Simple and fast interface'**
+  /// **'# Welcome to MarkPress\n\nClick the **folder icon** in the top right to open `.md` files.\n\n## Features\n- **Multi-tabs support**\n- **Export to PDF** (MarkPress engine)\n- **Mermaid diagrams** support\n- **Multi-language** support\n- Simple and fast interface'**
   String get welcomeContent;
 
   /// No description provided for @msgCopiedToClipboard.

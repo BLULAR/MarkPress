@@ -51,27 +51,27 @@ Ce diagramme détaille la logique de filtrage pour optimiser les performances et
 
 ```mermaid
 flowchart TD
-    Start([Requete Utilisateur]) --> NLP[Analyse LLM]
-    NLP --> Criteria{Critères Identifiés ?}
+    Start(["Requete Utilisateur"]) --> NLP["Analyse LLM"]
+    NLP --> Criteria{"Critères Identifiés ?"}
     
-    Criteria -- Oui --> FastSearch[Recherche Outlook (Restrict/DASL)]
-    Criteria -- Non --> Fallback[Scan Inbox (7 derniers jours)]
+    Criteria -- Oui --> FastSearch["Recherche Outlook DASL"]
+    Criteria -- Non --> Fallback["Scan Inbox 7 jours"]
     
-    FastSearch --> RawResults[Résultats Bruts (ex: 50 items)]
+    FastSearch --> RawResults["Résultats Bruts 50 items"]
     Fallback --> RawResults
     
-    RawResults --> MetaFilter[Filtrage Métadonnées]
-    MetaFilter --> candidates[Candidats (ex: 10 items)]
+    RawResults --> MetaFilter["Filtrage Métadonnées"]
+    MetaFilter --> candidates["Candidats 10 items"]
     
-    subgraph DeepAnalysis [Analyse Approfondie LLM]
-        candidates --> FetchBody[Lecture Corps Email]
-        FetchBody --> SemanticCheck{Pertinent ?}
+    subgraph DeepAnalysis ["Analyse Approfondie LLM"]
+        candidates --> FetchBody["Lecture Corps Email"]
+        FetchBody --> SemanticCheck{"Pertinent ?"}
     end
     
-    SemanticCheck -- Oui --> FinalList[Résultats Finaux]
-    SemanticCheck -- Non --> Ignore[Ignorer]
+    SemanticCheck -- Oui --> FinalList["Résultats Finaux"]
+    SemanticCheck -- Non --> Ignore["Ignorer"]
     
-    FinalList --> Response([Réponse Utilisateur])
+    FinalList --> Response(["Réponse Utilisateur"])
 ```
 
 ## 3. Architecture des Données (Class Diagram)

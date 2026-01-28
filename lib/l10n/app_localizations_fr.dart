@@ -55,7 +55,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get welcomeContent =>
-      '# Bienvenue sur MarkPress\n\nCliquez sur l\'icône **dossier** en haut à droite pour ouvrir des fichiers `.md`.\n\n## Fonctionnalités\n- **Support multi-onglets**\n- **Export vers PDF** (Moteur MarkPress)\n- **Multi-langue**\n- Interface simple et rapide';
+      '# Bienvenue sur MarkPress\n\nCliquez sur l\'icône **dossier** en haut à droite pour ouvrir des fichiers `.md`.\n\n## Fonctionnalités\n- **Support multi-onglets**\n- **Export vers PDF** (Moteur MarkPress)\n- **Diagrammes Mermaid** intégrés\n- **Multi-langue**\n- Interface simple et rapide';
 
   @override
   String get msgCopiedToClipboard => 'Copié dans le presse-papiers';

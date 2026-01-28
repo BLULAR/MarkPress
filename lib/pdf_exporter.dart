@@ -351,6 +351,8 @@ class _MarkdownToPdfConverter {
         final imageBytes = response.bodyBytes;
         final image = pw.MemoryImage(imageBytes);
         
+        // Constrain image to max 500px height to fit A4 page
+        // A4 page height is ~842pt minus margins (~778pt usable)
         return pw.Container(
           padding: const pw.EdgeInsets.all(8),
           decoration: pw.BoxDecoration(
@@ -358,7 +360,10 @@ class _MarkdownToPdfConverter {
             borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
           ),
           child: pw.Center(
-            child: pw.Image(image, fit: pw.BoxFit.contain),
+            child: pw.ConstrainedBox(
+              constraints: const pw.BoxConstraints(maxHeight: 500, maxWidth: 500),
+              child: pw.Image(image, fit: pw.BoxFit.contain),
+            ),
           ),
         );
       }

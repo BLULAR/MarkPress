@@ -649,7 +649,7 @@ class _HeaderBuilder extends MarkdownElementBuilder {
     anchors[id] = key;
     
     return Text(
-      '$content (DEBUG)', // DEBUG PROOF
+      content,
       key: key,
       style: textStyle ?? preferredStyle,
     );
@@ -750,6 +750,14 @@ class _CodeElementBuilder extends MarkdownElementBuilder {
                      );
                    },
                    errorBuilder: (context, error, stackTrace) {
+                     // Try to extract meaningful error info
+                     String errorMsg = 'Diagram syntax error or network issue';
+                     if (error.toString().contains('404')) {
+                       errorMsg = 'Invalid Mermaid syntax - check brackets and special characters';
+                     } else if (error.toString().contains('timeout')) {
+                       errorMsg = 'Network timeout - try again later';
+                     }
+                     
                      return Container(
                        padding: const EdgeInsets.all(16),
                        decoration: BoxDecoration(
@@ -757,17 +765,28 @@ class _CodeElementBuilder extends MarkdownElementBuilder {
                          borderRadius: BorderRadius.circular(8),
                        ),
                        child: Column(
+                         crossAxisAlignment: CrossAxisAlignment.start,
                          children: [
-                           Icon(Icons.error_outline, color: theme.colorScheme.error, size: 32),
-                           const SizedBox(height: 8),
-                           Text('Error rendering diagram', style: TextStyle(color: theme.colorScheme.error, fontWeight: FontWeight.bold)),
-                           const SizedBox(height: 8),
-                           // Show the code as fallback
+                           Row(
+                             children: [
+                               Icon(Icons.warning_amber_rounded, color: theme.colorScheme.error, size: 24),
+                               const SizedBox(width: 8),
+                               Expanded(
+                                 child: Text(errorMsg, 
+                                   style: TextStyle(color: theme.colorScheme.error, fontWeight: FontWeight.bold)),
+                               ),
+                             ],
+                           ),
+                           const SizedBox(height: 12),
+                           Text('Mermaid code:', style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onErrorContainer)),
+                           const SizedBox(height: 4),
                            Container(
+                             width: double.infinity,
                              padding: const EdgeInsets.all(8),
                              decoration: BoxDecoration(
                                color: theme.colorScheme.surface,
                                borderRadius: BorderRadius.circular(4),
+                               border: Border.all(color: theme.colorScheme.outline.withOpacity(0.3)),
                              ),
                              child: SelectableText(
                                unescapedCode,
