@@ -17,11 +17,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'l10n/app_localizations.dart';
 import 'pdf_exporter.dart';
 import 'single_instance.dart';
-import 'package:window_manager/window_manager.dart';
+// import 'package:window_manager/window_manager.dart';
 
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
+  // await windowManager.ensureInitialized();
   
   // Single Instance Check
   final isMainInstance = await SingleInstance.initialize(args);
@@ -182,8 +182,8 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
       if (path.isNotEmpty) {
         await _openInitialFile(path);
         if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-           await windowManager.show();
-           await windowManager.focus();
+           // await windowManager.show();
+           // await windowManager.focus();
         }
       }
     });
@@ -556,13 +556,14 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
                       // Using locale in the key forces rebuild when language changes
                       key: ValueKey(file.name + file.content.length.toString() + l10n.localeName),
                       data: file.content,
-                      selectable: true,
+                      selectable: true, // Restored
                       extensionSet: md.ExtensionSet.gitHubFlavored,
                       builders: {
                         'h1': _HeaderBuilder(_anchors, _slugify, theme.textTheme.headlineMedium?.copyWith(fontFamily: GoogleFonts.poppins().fontFamily)),
                         'h2': _HeaderBuilder(_anchors, _slugify, theme.textTheme.titleLarge?.copyWith(fontFamily: GoogleFonts.poppins().fontFamily)),
                         'h3': _HeaderBuilder(_anchors, _slugify, theme.textTheme.titleMedium?.copyWith(fontFamily: GoogleFonts.poppins().fontFamily)),
                         'pre': _CodeElementBuilder(context),
+                        'code': _CodeElementBuilder(context),
                       },
                       onTapLink: (text, href, title) async {
                         if (href != null) {
@@ -648,7 +649,7 @@ class _HeaderBuilder extends MarkdownElementBuilder {
     anchors[id] = key;
     
     return Text(
-      content,
+      '$content (DEBUG)', // DEBUG PROOF
       key: key,
       style: textStyle ?? preferredStyle,
     );
@@ -661,46 +662,65 @@ class _CodeElementBuilder extends MarkdownElementBuilder {
   _CodeElementBuilder(this.context);
 
   @override
-  Widget? visitElement(md.Element element, TextStyle? preferredStyle, TextStyle? parentStyle) {
-    var text = element.textContent;
+  Widget? visitElementAfterWithContext(BuildContext ctx, md.Element element, TextStyle? preferredStyle, TextStyle? parentStyle) {
+    try {
+      var text = element.textContent;
+    // ... logic continues ...
     // Remove the last newline that is often added by the parser
     if (text.endsWith('\n')) {
       text = text.substring(0, text.length - 1);
+    }
+    
+    // Robust Mermaid Detection
+    bool isMermaid = false;
+    String codeContent = text;
+    
+    // Check PRE attributes (rare but possible)
+    if (element.attributes.containsKey('class') && 
+        element.attributes['class']!.contains('mermaid')) {
+        isMermaid = true;
+    }
+    
+    // Check CODE child attributes (standard GFM)
+    if (!isMermaid && element.children != null) {
+      for (final child in element.children!) {
+        if (child is md.Element && child.tag == 'code') {
+           if (child.attributes.containsKey('class') && 
+               child.attributes['class']!.contains('mermaid')) {
+             isMermaid = true;
+             codeContent = child.textContent; // Use content from code block
+             break;
+           }
+        }
+      }
     }
 
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    // Detect Mermaid
-    bool isMermaid = false;
-    if (element.children != null && 
-        element.children!.isNotEmpty && 
-        element.children!.first is md.Element) {
-      final codeElement = element.children!.first as md.Element;
-      if (codeElement.tag == 'code' && 
-          codeElement.attributes.containsKey('class') &&
-          codeElement.attributes['class']!.contains('mermaid')) {
-        isMermaid = true;
-      }
-    }
-
     if (isMermaid) {
        try {
-         // Create Mermaid.ink URL
-         // Structure: { "code": "...", "mermaid": { "theme": "dark" } }
-         final jsonState = jsonEncode({
-           'code': text,
-           'mermaid': {'theme': isDark ? 'dark' : 'default'}
-         });
-         final base64State = base64Encode(utf8.encode(jsonState));
-         final url = 'https://mermaid.ink/img/$base64State';
+         // Fix: Unescape HTML entities (like &gt; becoming >)
+         String unescapedCode = codeContent
+            .replaceAll('&gt;', '>')
+            .replaceAll('&lt;', '<')
+            .replaceAll('&amp;', '&')
+            .replaceAll('&quot;', '"')
+            .replaceAll('&#39;', "'");
+
+         // Create Mermaid.ink URL using simple base64 encoding
+         // Encode just the code directly (most compatible format)
+         final base64Code = base64Url.encode(utf8.encode(unescapedCode));
+         
+         // Simple format without pako compression
+         final url = 'https://mermaid.ink/img/$base64Code';
 
          return Container(
            margin: const EdgeInsets.symmetric(vertical: 16),
-           padding: const EdgeInsets.all(16),
+           padding: const EdgeInsets.all(12),
            decoration: BoxDecoration(
-             color: theme.colorScheme.surface,
-             borderRadius: BorderRadius.circular(8),
+             color: theme.colorScheme.surfaceContainerHighest,
+             borderRadius: BorderRadius.circular(12),
              border: Border.all(color: theme.colorScheme.outlineVariant),
            ),
            child: Column(
@@ -709,6 +729,8 @@ class _CodeElementBuilder extends MarkdownElementBuilder {
                Row(
                  mainAxisAlignment: MainAxisAlignment.end,
                  children: [
+                   Icon(Icons.schema_outlined, size: 16, color: theme.colorScheme.primary),
+                   const SizedBox(width: 4),
                    Text('Mermaid Diagram', style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.primary)),
                  ],
                ),
@@ -729,15 +751,29 @@ class _CodeElementBuilder extends MarkdownElementBuilder {
                    },
                    errorBuilder: (context, error, stackTrace) {
                      return Container(
-                       padding: const EdgeInsets.all(8),
-                       color: theme.colorScheme.errorContainer,
+                       padding: const EdgeInsets.all(16),
+                       decoration: BoxDecoration(
+                         color: theme.colorScheme.errorContainer,
+                         borderRadius: BorderRadius.circular(8),
+                       ),
                        child: Column(
                          children: [
-                           Icon(Icons.broken_image, color: theme.colorScheme.error),
-                           const SizedBox(height: 4),
-                           Text('Error rendering diagram', style: TextStyle(color: theme.colorScheme.error)),
-                           const SizedBox(height: 4),
-                           Text(error.toString(), style: theme.textTheme.bodySmall, textAlign: TextAlign.center),
+                           Icon(Icons.error_outline, color: theme.colorScheme.error, size: 32),
+                           const SizedBox(height: 8),
+                           Text('Error rendering diagram', style: TextStyle(color: theme.colorScheme.error, fontWeight: FontWeight.bold)),
+                           const SizedBox(height: 8),
+                           // Show the code as fallback
+                           Container(
+                             padding: const EdgeInsets.all(8),
+                             decoration: BoxDecoration(
+                               color: theme.colorScheme.surface,
+                               borderRadius: BorderRadius.circular(4),
+                             ),
+                             child: SelectableText(
+                               unescapedCode,
+                               style: GoogleFonts.firaCode(fontSize: 10, color: theme.colorScheme.onSurface),
+                             ),
+                           ),
                          ],
                        ),
                      );
@@ -759,17 +795,17 @@ class _CodeElementBuilder extends MarkdownElementBuilder {
           margin: const EdgeInsets.symmetric(vertical: 8),
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceVariant,
+            color: theme.colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+            border: Border.all(color: theme.colorScheme.outlineVariant),
           ),
           child: SelectableText(
-            text,
-            style: GoogleFonts.firaCode(
+              text,
+              style: GoogleFonts.firaCode(
               color: theme.colorScheme.onSurfaceVariant,
               fontSize: 14,
               height: 1.5,
-            ),
+              ),
           ),
         ),
         Positioned(
@@ -779,9 +815,9 @@ class _CodeElementBuilder extends MarkdownElementBuilder {
             icon: const Icon(Icons.content_copy_rounded, size: 18),
             tooltip: 'Copy code',
             style: IconButton.styleFrom(
-              backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.5),
+              backgroundColor: theme.colorScheme.surface.withOpacity(0.5),
               foregroundColor: theme.colorScheme.primary,
-              hoverColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+              hoverColor: theme.colorScheme.primary.withOpacity(0.1),
             ),
             onPressed: () {
               Clipboard.setData(ClipboardData(text: text));
@@ -805,5 +841,12 @@ class _CodeElementBuilder extends MarkdownElementBuilder {
         ),
       ],
     );
+    } catch (e) {
+      return Container(
+        padding: const EdgeInsets.all(8),
+        color: Colors.red,
+        child: Text('BUILDER ERROR: $e', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      );
+    }
   }
 }

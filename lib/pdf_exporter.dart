@@ -1,8 +1,11 @@
 import 'dart:typed_data';
+import 'dart:convert';
+import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:markdown/markdown.dart' as md;
 import 'package:printing/printing.dart';
+import 'package:http/http.dart' as http;
 
 class PdfExporter {
   static Future<Uint8List> generatePdf(String markdownContent) async {
@@ -72,7 +75,7 @@ class PdfExporter {
     );
 
     try {
-      final widgets = converter.convert(processedContent);
+      final widgets = await converter.convert(processedContent);
   
       pdf.addPage(
         pw.MultiPage(
@@ -116,23 +119,23 @@ class _MarkdownToPdfConverter {
     required this.fontFallback,
   });
 
-  List<pw.Widget> convert(String markdownContent) {
+  Future<List<pw.Widget>> convert(String markdownContent) async {
     // Enable HTML block parsing to handle <div> etc. better
     final List<md.Node> nodes = md.Document(
       extensionSet: md.ExtensionSet.gitHubFlavored,
       encodeHtml: false, 
     ).parse(markdownContent);
     
-    return _parseNodes(nodes);
+    return await _parseNodes(nodes);
   }
 
-  List<pw.Widget> _parseNodes(List<md.Node> nodes) {
+  Future<List<pw.Widget>> _parseNodes(List<md.Node> nodes) async {
     final widgets = <pw.Widget>[];
 
     for (final node in nodes) {
       try {
         if (node is md.Element) {
-          widgets.addAll(_parseElement(node));
+          widgets.addAll(await _parseElement(node));
         } else if (node is md.Text) {
           widgets.add(pw.Text(_unescape(node.text), style: pw.TextStyle(fontFallback: fontFallback)));
         }
@@ -177,7 +180,7 @@ class _MarkdownToPdfConverter {
     );
   }
 
-  List<pw.Widget> _parseElement(md.Element element) {
+  Future<List<pw.Widget>> _parseElement(md.Element element) async {
     final widgets = <pw.Widget>[];
 
     switch (element.tag) {
@@ -209,10 +212,71 @@ class _MarkdownToPdfConverter {
       case 'code':
       case 'pre':
         final text = _unescape(element.textContent);
+        
+        // Check for Mermaid diagram
+        bool isMermaid = false;
+        String mermaidCode = text;
+        
+        // Check element class
+        if (element.attributes.containsKey('class') && 
+            element.attributes['class']!.contains('language-mermaid')) {
+          isMermaid = true;
+        }
+        
+        // Check children for <code class="language-mermaid">
+        if (!isMermaid && element.children != null) {
+          for (final child in element.children!) {
+            if (child is md.Element && child.tag == 'code') {
+              if (child.attributes.containsKey('class') &&
+                  child.attributes['class']!.contains('language-mermaid')) {
+                isMermaid = true;
+                mermaidCode = _unescape(child.textContent);
+                break;
+              }
+            }
+          }
+        }
+        
+        if (isMermaid) {
+          // Try to fetch and embed Mermaid diagram as image
+          try {
+            final imageWidget = await _buildMermaidImage(mermaidCode);
+            if (imageWidget != null) {
+              widgets.add(imageWidget);
+              widgets.add(pw.SizedBox(height: 10));
+              break;
+            }
+          } catch (e) {
+            // Fall through to code block fallback
+          }
+          
+          // Fallback: Show as styled code block with label
+          widgets.add(
+            pw.Container(
+              padding: const pw.EdgeInsets.all(8),
+              decoration: pw.BoxDecoration(
+                color: PdfColors.amber50,
+                border: pw.Border.all(color: PdfColors.amber),
+                borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
+              ),
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text('Mermaid Diagram (requires network)', 
+                    style: pw.TextStyle(fontSize: 8, color: PdfColors.amber900, fontWeight: pw.FontWeight.bold)),
+                  pw.SizedBox(height: 4),
+                  pw.Text(mermaidCode, 
+                    style: pw.TextStyle(font: monoFont, fontFallback: fontFallback, fontSize: 8)),
+                ],
+              ),
+            ),
+          );
+          widgets.add(pw.SizedBox(height: 10));
+          break;
+        }
+        
+        // Standard code block
         final lines = text.split('\n');
-        // Chunking strategy to prevent "Widget won't fit" error on massive code blocks
-        // We split the code block into smaller widgets (e.g. 40 lines each)
-        // so the PDF engine has clear break points.
         const int chunkSize = 40;
         for (int i = 0; i < lines.length; i += chunkSize) {
           final end = (i + chunkSize < lines.length) ? i + chunkSize : lines.length;
@@ -221,7 +285,7 @@ class _MarkdownToPdfConverter {
           
           widgets.add(
             pw.Container(
-              padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 2), // Reduced vertical padding for continuity
+              padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               color: PdfColors.grey100,
               width: double.infinity,
               child: pw.Text(
@@ -262,12 +326,47 @@ class _MarkdownToPdfConverter {
       default:
         // Handle div, section, etc. simply by parsing children
         if (element.children != null && element.children!.isNotEmpty) {
-           widgets.addAll(_parseNodes(element.children!));
+           widgets.addAll(await _parseNodes(element.children!));
         }
         break;
     }
 
     return widgets;
+  }
+  
+  /// Fetch Mermaid diagram as PNG from mermaid.ink and return as pw.Image
+  Future<pw.Widget?> _buildMermaidImage(String mermaidCode) async {
+    try {
+      // Build URL using simple base64 encoding (same as main.dart)
+      final base64Code = base64Url.encode(utf8.encode(mermaidCode));
+      final url = 'https://mermaid.ink/img/$base64Code';
+      
+      // Fetch image with timeout
+      final response = await http.get(Uri.parse(url)).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => throw Exception('Timeout fetching diagram'),
+      );
+      
+      if (response.statusCode == 200) {
+        final imageBytes = response.bodyBytes;
+        final image = pw.MemoryImage(imageBytes);
+        
+        return pw.Container(
+          padding: const pw.EdgeInsets.all(8),
+          decoration: pw.BoxDecoration(
+            border: pw.Border.all(color: PdfColors.grey300),
+            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
+          ),
+          child: pw.Center(
+            child: pw.Image(image, fit: pw.BoxFit.contain),
+          ),
+        );
+      }
+      
+      return null;
+    } catch (e) {
+      return null;
+    }
   }
 
   List<pw.Widget> _buildList(md.Element element) {
