@@ -9,8 +9,8 @@
     "msgErrorOpen": "Error al abrir: {error}",
     "msgErrorExport": "Error al exportar: {error}",
     "labelPath": "Ruta: {path}",
-    "aboutDev": "Desarrollado por SergeT",
-    "aboutDesc": "MarkPress es un visor de Markdown moderno y ligero para escritorio. Vea varios archivos en pestañas, navegue fácilmente y exporte sus documentos a PDF de alta calidad.",
+    "aboutDev": "Desarrollado por Serge Toulzac",
+    "aboutDesc": "MarkPress es un visor de Markdown moderno y ligero para escritorio. Vea varios archivos en pestañas, renderice diagramas Mermaid y exporte sus documentos a PDF de alta calidad.",
     "welcomeContent": "# Bienvenido a MarkPress\n\nHaga clic en el icono de **carpeta** en la parte superior derecha para abrir archivos `.md`.\n\n## Características\n- **Soporte multi-pestaña**\n- **Exportación a PDF** (Motor MarkPress)\n- **Diagramas Mermaid** integrados\n- **Multilenguaje**\n- Interfaz simple y rápida",
     "msgCopiedToClipboard": "Copiado al portapapeles"
 }

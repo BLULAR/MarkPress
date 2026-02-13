@@ -466,7 +466,7 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
               showAboutDialog(
                 context: context,
                 applicationName: l10n.appTitle,
-                applicationVersion: '1.0.0+1',
+                applicationVersion: '2.0.0+1',
                 applicationIcon: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.asset(
@@ -557,13 +557,16 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
                       key: ValueKey(file.name + file.content.length.toString() + l10n.localeName),
                       data: file.content,
                       selectable: true, // Restored
-                      extensionSet: md.ExtensionSet.gitHubFlavored,
+                      extensionSet: md.ExtensionSet(
+                        List<md.BlockSyntax>.from(md.ExtensionSet.gitHubFlavored.blockSyntaxes)
+                          ..removeWhere((s) => s.runtimeType.toString() == 'IndentedCodeSyntax'),
+                        List<md.InlineSyntax>.from(md.ExtensionSet.gitHubFlavored.inlineSyntaxes),
+                      ),
                       builders: {
                         'h1': _HeaderBuilder(_anchors, _slugify, theme.textTheme.headlineMedium?.copyWith(fontFamily: GoogleFonts.poppins().fontFamily)),
                         'h2': _HeaderBuilder(_anchors, _slugify, theme.textTheme.titleLarge?.copyWith(fontFamily: GoogleFonts.poppins().fontFamily)),
                         'h3': _HeaderBuilder(_anchors, _slugify, theme.textTheme.titleMedium?.copyWith(fontFamily: GoogleFonts.poppins().fontFamily)),
                         'pre': _CodeElementBuilder(context),
-                        'code': _CodeElementBuilder(context),
                       },
                       onTapLink: (text, href, title) async {
                         if (href != null) {

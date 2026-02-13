@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MarkPress | Le Viewer Markdown Moderne & Robuste</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Fira+Code&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --primary: #1976D2;
@@ -38,7 +40,7 @@
             color: var(--white);
             border-bottom-left-radius: 50px;
             border-bottom-right-radius: 50px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         .logo {
@@ -99,7 +101,7 @@
             background: var(--white);
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s ease;
         }
 
@@ -143,8 +145,15 @@
 
         /* --- Animations --- */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .animate {
@@ -152,6 +161,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <header>
@@ -165,7 +175,7 @@
         <section class="hero animate" style="animation-delay: 0.2s;">
             <h2>Visualisez. Exportez. Sans crash.</h2>
             <p>Un outil léger pour Windows, conçu pour la lisibilité et la robustesse des exports PDF.</p>
-            
+
             <a href="https://github.com/BLULAR/MarkPress" class="btn-download">
                 Télécharger MarkPress pour Windows
             </a>
@@ -175,30 +185,35 @@
         <section class="features animate" style="animation-delay: 0.4s;">
             <div class="feature-card">
                 <h3>🚀 Export PDF Intelligent <span class="badge-new">Unique</span></h3>
-                <p>Grâce au système de "Smart Chunking", MarkPress exporte des fichiers massifs (manifests Kubernetes, logs) sans aucun crash de rendu. Fini les pages blanches.</p>
+                <p>Grâce au système de "Smart Chunking", MarkPress exporte des fichiers massifs (manifests Kubernetes,
+                    logs) sans aucun crash de rendu. Fini les pages blanches.</p>
             </div>
             <div class="feature-card">
                 <h3>🎨 Material 3 & Fluide</h3>
-                <p>Une interface moderne avec des polices Google Fonts (Poppins, Fira Code) et des animations fluides pour un confort de lecture optimal.</p>
+                <p>Une interface moderne avec des polices Google Fonts (Poppins, Fira Code) et des animations fluides
+                    pour un confort de lecture optimal.</p>
             </div>
             <div class="feature-card">
                 <h3>🔒 Confidentialité Totale</h3>
-                <p>MarkPress fonctionne 100% hors-ligne. Vos documents ne transitent jamais par un serveur. Vos données restent les vôtres.</p>
+                <p>MarkPress fonctionne 100% hors-ligne. Vos documents ne transitent jamais par un serveur. Vos données
+                    restent les vôtres.</p>
             </div>
             <div class="feature-card">
                 <h3>🛠️ Taillé pour les Devs</h3>
-                <p>Support complet du GitHub Flavored Markdown (tables, code blocks, tâches) avec une colorisation syntaxique élégante.</p>
+                <p>Support complet du GitHub Flavored Markdown (tables, code blocks, tâches) avec une colorisation
+                    syntaxique élégante.</p>
             </div>
         </section>
     </main>
 
     <footer class="animate" style="animation-delay: 0.6s;">
-        <p>Créé par <strong>SergeT</strong> avec Flutter</p>
+        <p>Créé par <strong>Serge Toulzac</strong> avec Flutter</p>
         <p>
-            <a href="https://github.com/BLULAR/MarkPress">Code Source sur GitHub</a> | 
+            <a href="https://github.com/BLULAR/MarkPress">Code Source sur GitHub</a> |
             <a href="https://github.com/BLULAR/MarkPress/issues">Signaler un bug</a>
         </p>
     </footer>
 
 </body>
+
 </html>

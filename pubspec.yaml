@@ -1,7 +1,7 @@
 name: markdown_viewer
 description: A simple Markdown viewer application.
 publish_to: 'none'
-version: 1.0.0+1
+version: 2.0.0+1
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -29,9 +29,20 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  msix: ^3.16.0
 
 flutter:
   uses-material-design: true
   generate: true
   assets:
     - logo/
+
+msix_config:
+  display_name: MarkPress
+  publisher_display_name: Toulzac
+  identity_name: Toulzac.MarkPress
+  publisher: CN=B4FF146D-2F34-4659-A82D-63458E3B4CFB
+  msix_version: 2.0.0.0
+  logo_path: windows/runner/resources/app_icon.ico
+  capabilities: internetClient
+  languages: en-us, fr-fr, de-de, es-es, it-it

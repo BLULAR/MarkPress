@@ -122,7 +122,11 @@ class _MarkdownToPdfConverter {
   Future<List<pw.Widget>> convert(String markdownContent) async {
     // Enable HTML block parsing to handle <div> etc. better
     final List<md.Node> nodes = md.Document(
-      extensionSet: md.ExtensionSet.gitHubFlavored,
+      extensionSet: md.ExtensionSet(
+        List<md.BlockSyntax>.from(md.ExtensionSet.gitHubFlavored.blockSyntaxes)
+          ..removeWhere((s) => s.runtimeType.toString() == 'IndentedCodeSyntax'),
+        List<md.InlineSyntax>.from(md.ExtensionSet.gitHubFlavored.inlineSyntaxes),
+      ),
       encodeHtml: false, 
     ).parse(markdownContent);
     
@@ -510,9 +514,25 @@ class _MarkdownToPdfConverter {
   pw.Widget _buildTable(md.Element element) {
     try {
       final rows = <pw.TableRow>[];
+      int maxColumns = 0;
+      final Map<int, int> columnContentLengths = {};
+
+      // Helper to track content length per column for better distribution
+      void trackContentLength(md.Element row) {
+        final cells = row.children?.whereType<md.Element>().toList() ?? [];
+        for (int i = 0; i < cells.length; i++) {
+          final length = cells[i].textContent.length;
+          columnContentLengths[i] = (columnContentLengths[i] ?? 0) + length;
+        }
+      }
 
       void addRow(md.Element row, {bool isHeader = false}) {
-        rows.add(_buildTableRow(row, isHeader: isHeader, rowIndex: rows.length));
+        trackContentLength(row);
+        final tableRow = _buildTableRow(row, isHeader: isHeader, rowIndex: rows.length);
+        if (tableRow.children.length > maxColumns) {
+          maxColumns = tableRow.children.length;
+        }
+        rows.add(tableRow);
       }
 
       for (final child in element.children ?? []) {
@@ -537,9 +557,20 @@ class _MarkdownToPdfConverter {
 
       if (rows.isEmpty) return pw.Container();
 
+      // Define column widths based on content density
+      final Map<int, pw.TableColumnWidth> columnWidths = {};
+      for (int i = 0; i < maxColumns; i++) {
+        final length = columnContentLengths[i] ?? 0;
+        // Base weight of 1.0, plus a factor based on content length
+        // This gives more space to columns with more text
+        final double weight = 1.0 + (length / 20.0).clamp(0.0, 5.0);
+        columnWidths[i] = pw.FlexColumnWidth(weight);
+      }
+
       return pw.Table(
         border: pw.TableBorder.all(color: PdfColors.grey400),
         defaultVerticalAlignment: pw.TableCellVerticalAlignment.middle,
+        columnWidths: columnWidths,
         children: rows,
       );
     } catch (e) {
@@ -554,9 +585,7 @@ class _MarkdownToPdfConverter {
         cells.add(
           pw.Container(
             padding: const pw.EdgeInsets.all(6),
-            color: isHeader
-                ? PdfColors.grey300
-                : (rowIndex % 2 == 1 ? PdfColors.grey100 : null),
+            color: isHeader ? PdfColors.grey300 : null,
             child: _buildRichText(
               cell,
               style: isHeader ? pw.TextStyle(fontWeight: pw.FontWeight.bold, fontFallback: fontFallback) : null,

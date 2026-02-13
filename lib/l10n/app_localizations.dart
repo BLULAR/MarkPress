@@ -167,13 +167,13 @@ abstract class AppLocalizations {
   /// No description provided for @aboutDev.
   ///
   /// In en, this message translates to:
-  /// **'Developed by SergeT'**
+  /// **'Developed by Serge Toulzac'**
   String get aboutDev;
 
   /// No description provided for @aboutDesc.
   ///
   /// In en, this message translates to:
-  /// **'MarkPress is a modern, lightweight Markdown viewer for desktop. View multiple files in tabs, navigate with ease, and export your documents to high-quality PDFs.'**
+  /// **'MarkPress is a modern, lightweight Markdown viewer for desktop. View multiple files in tabs, render Mermaid diagrams, and export your documents to high-quality PDFs.'**
   String get aboutDesc;
 
   /// No description provided for @welcomeContent.

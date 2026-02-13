@@ -4,30 +4,35 @@
 
 ![MarkPress Logo](logo/mdviewer32x32.jpg)
 
-## ✨ Features
+## ✨ Fonctionnalités Principales
 
-*   **🗂️ Multi-Tab Interface**: Open and manage multiple `.md` files simultaneously in a browser-like tabbed interface.
-*   **📊 Mermaid Diagrams**: Render flowcharts, sequence diagrams, and more directly in your Markdown.
-*   **📄 Professional PDF Export**: Convert your Markdown notes into beautifully formatted PDF documents with embedded diagrams.
-*   **🌍 Multi-Language Support**: Fully localized in English, French, German, Italian, and Spanish.
-*   **🎨 Modern Design**: Built with Material 3 and `FlexColorScheme` for a polished, native Windows 11 feel.
-*   **🚀 Fast & Lightweight**: optimized for desktop performance.
-*   **🔒 Secure**: Safe link handling and local file processing (no cloud dependencies).
+*   **🎨 Interface Material 3** : Une UI fluide et moderne avec des animations soignées (powered by Flutter).
+*   **📊 Diagrammes Mermaid** : Affichez flowcharts, diagrammes de séquence et plus directement dans vos fichiers Markdown.
+*   **📄 Moteur d'Export PDF Robuste** :
+    *   Conversion fidèle du Markdown vers PDF.
+    *   Gestion intelligente des blocs de code massifs (K8s, Logs) grâce au "Smart Chunking" (plus de crashs sur les longs fichiers !).
+    *   Intégration des diagrammes Mermaid dans les PDFs exportés.
+    *   Support des polices spéciales et fallback automatique pour les symboles.
+    *   Gestion sécurisée des Emojis (nettoyage automatique si non supportés).
+*   **🖼️ Gestion des Médias** :
+    *   Affichage des images locales et distantes dans l'éditeur.
+    *   Dans le PDF : Remplacement automatique des images par des placeholders visuels [IMG] si nécessaire.
+*   **🌍 Multi-Langue** : Entièrement localisé en Français, Anglais, Allemand, Italien et Espagnol.
+*   **🔒 100% Local** : Vos fichiers ne quittent jamais votre machine. Sécurité et confidentialité totales.
+*   **🔗 Navigation Avancée** : Support des liens internes (ancres) et liens externes sécurisés.
 
-## ⬇️ Download & Installation
+## 🛠️ Améliorations Techniques (v2.0.0)
 
-For regular users who just want to use MarkPress, you don't need to build from source.
+*   Correction du crash "Widget won't fit" lors de l'export PDF de très longs fichiers (ex: manifestes Kubernetes).
+*   Support des diagrammes Mermaid via mermaid.ink.
+*   Optimisation du parsing Markdown (GitHub Flavored).
+*   Installeur Windows optimisé (Setup léger).
 
-1.  Go to the [Latest Releases](https://github.com/votre-user/votre-repo/releases/latest) page.
-2.  Download the **`MarkPress_Setup_v1.0.0.exe`** file.
-3.  Run the installer.
+## ⬇️ Installation
 
-### ⚠️ Windows SmartScreen Warning
-Since MarkPress is a free and open-source tool, the installer is not digitally signed with a paid certificate. Windows might show a blue or red "Windows protected your PC" screen. 
-
-**Don't worry, it's safe!** To proceed:
-1.  Click on **"More info"** (Informations complémentaires).
-2.  Click on the **"Run anyway"** (Exécuter quand même) button.
+1.  Téléchargez le fichier **`MarkPress_Setup_v2.0.0.exe`** depuis la [page des Releases](https://github.com/BLULAR/MarkPress/releases/latest).
+2.  Lancez l'installation (SmartScreen peut apparaître car le certificat est auto-signé, cliquez sur "Informations complémentaires" > "Exécuter quand même").
+3.  Profitez de vos fichiers Markdown !
 
 ---
 
@@ -42,8 +47,8 @@ Since MarkPress is a free and open-source tool, the installer is not digitally s
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/YOUR_USERNAME/markpress.git
-    cd markpress
+    git clone https://github.com/BLULAR/MarkPress.git
+    cd MarkPress
     ```
 
 2.  **Install dependencies:**
@@ -72,9 +77,9 @@ To create a standalone `.exe` installer for distribution:
 *   **Flutter** - UI Toolkit
 *   **flutter_markdown** - Markdown rendering
 *   **printing** & **pdf** - PDF generation
-*   **flex_color_scheme** - Theming
+*   **flex_color_scheme** - Theming (Material 3)
 *   **flutter_animate** - Animations
-*   **shared_preferences** - Local settings storage
+*   **mermaid.ink** - Diagram rendering
 
 ## 📄 License
 
@@ -82,4 +87,4 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 ## 👨‍💻 Developer
 
-Developed by **SergeT**.
+Developed by **Serge Toulzac**.

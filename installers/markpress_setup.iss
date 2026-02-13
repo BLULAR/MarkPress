@@ -2,8 +2,8 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "MarkPress"
-#define MyAppVersion "1.0.0"
-#define MyAppPublisher "SergeT"
+#define MyAppVersion "2.1.0"
+#define MyAppPublisher "Serge Toulzac"
 #define MyAppExeName "MarkPress.exe"
 
 [Setup]
@@ -17,7 +17,7 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
-;PrivilegesRequired=lowest
+PrivilegesRequired=lowest
 OutputDir=..\installers
 OutputBaseFilename=MarkPress_Setup_v{#MyAppVersion}
 SetupIconFile=..\windows\runner\resources\app_icon.ico
@@ -37,12 +37,13 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "assoc"; Description: "{cm:AssocFileExtension,{#MyAppName},.md}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Registry]
-Root: HKCR; Subkey: ".md"; ValueType: string; ValueName: ""; ValueData: "{#MyAppName}File"; Flags: uninsdeletevalue; Tasks: assoc
-Root: HKCR; Subkey: "{#MyAppName}File"; ValueType: string; ValueName: ""; ValueData: "Markdown File"; Flags: uninsdeletekey; Tasks: assoc
-Root: HKCR; Subkey: "{#MyAppName}File\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"; Tasks: assoc
-Root: HKCR; Subkey: "{#MyAppName}File\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Tasks: assoc
-Root: HKCR; Subkey: "Applications\{#MyAppExeName}\SupportedTypes"; ValueType: string; ValueName: ".md"; ValueData: ""; Flags: uninsdeletekey
-Root: HKCR; Subkey: "Applications\{#MyAppExeName}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
+; Use HKCU instead of HKCR for non-admin installation
+Root: HKCU; Subkey: "Software\Classes\.md"; ValueType: string; ValueName: ""; ValueData: "{#MyAppName}File"; Flags: uninsdeletevalue; Tasks: assoc
+Root: HKCU; Subkey: "Software\Classes\{#MyAppName}File"; ValueType: string; ValueName: ""; ValueData: "Markdown File"; Flags: uninsdeletekey; Tasks: assoc
+Root: HKCU; Subkey: "Software\Classes\{#MyAppName}File\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"; Tasks: assoc
+Root: HKCU; Subkey: "Software\Classes\{#MyAppName}File\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Tasks: assoc
+Root: HKCU; Subkey: "Software\Classes\Applications\{#MyAppExeName}\SupportedTypes"; ValueType: string; ValueName: ".md"; ValueData: ""; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\Applications\{#MyAppExeName}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
 
 [Files]
 Source: "..\build\windows\x64\runner\Release\markdown_viewer.exe"; DestDir: "{app}"; DestName: "{#MyAppExeName}"; Flags: ignoreversion

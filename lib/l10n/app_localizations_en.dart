@@ -47,11 +47,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get aboutDev => 'Developed by SergeT';
+  String get aboutDev => 'Developed by Serge Toulzac';
 
   @override
   String get aboutDesc =>
-      'MarkPress is a modern, lightweight Markdown viewer for desktop. View multiple files in tabs, navigate with ease, and export your documents to high-quality PDFs.';
+      'MarkPress is a modern, lightweight Markdown viewer for desktop. View multiple files in tabs, render Mermaid diagrams, and export your documents to high-quality PDFs.';
 
   @override
   String get welcomeContent =>
