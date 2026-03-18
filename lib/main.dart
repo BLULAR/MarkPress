@@ -7,8 +7,6 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:printing/printing.dart';
-import 'package:pdf/pdf.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -16,6 +14,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'l10n/app_localizations.dart';
 import 'pdf_exporter.dart';
+import 'word_exporter.dart';
 import 'single_instance.dart';
 // import 'package:window_manager/window_manager.dart';
 
@@ -98,7 +97,7 @@ class _MarkPressAppState extends State<MarkPressApp> {
     return MaterialApp(
       title: 'MarkPress',
       debugShowCheckedModeBanner: false,
-      localizationsDelegates: [
+      localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -119,7 +118,7 @@ class _MarkPressAppState extends State<MarkPressApp> {
         subThemesData: const FlexSubThemesData(
           blendOnLevel: 10,
           blendOnColors: false,
-          useTextTheme: true,
+          useMaterial3Typography: true,
           useM2StyleDividerInM3: true,
           alignedDropdown: true,
           useInputDecoratorThemeInDialogs: true,
@@ -135,7 +134,7 @@ class _MarkPressAppState extends State<MarkPressApp> {
         blendLevel: 13,
         subThemesData: const FlexSubThemesData(
           blendOnLevel: 20,
-          useTextTheme: true,
+          useMaterial3Typography: true,
           useM2StyleDividerInM3: true,
           alignedDropdown: true,
           useInputDecoratorThemeInDialogs: true,
@@ -250,6 +249,9 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
         });
       } else {
          // Fallback if file not found
+         if (!mounted) {
+           return;
+         }
          final l10n = AppLocalizations.of(context)!;
          if (_openedFiles.isEmpty) {
              _openedFiles.add(MarkdownFile(name: l10n.tabWelcome, content: l10n.welcomeContent));
@@ -422,6 +424,51 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
     }
   }
 
+  Future<void> _exportWord() async {
+    final index = _isControllerInit ? _tabController.index : _activeTabIndex;
+    final currentFile = _openedFiles[index.clamp(0, _openedFiles.length - 1)];
+
+    try {
+      String? outputFile = await FilePicker.platform.saveFile(
+        dialogTitle: 'Save Word Document',
+        fileName: '${currentFile.name}.docx',
+        allowedExtensions: ['docx'],
+        type: FileType.custom,
+      );
+
+      if (outputFile == null) return;
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      final docxBytes = await WordExporter.generateDocx(currentFile.content);
+      final file = File(outputFile);
+      await file.writeAsBytes(docxBytes);
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.msgSavedTo(outputFile)),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.msgErrorExportWord(e.toString()))),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     _anchors.clear();
@@ -491,6 +538,11 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
             onPressed: _exportPdf,
           ).animate().fadeIn(delay: 200.ms).scale(),
           IconButton(
+            icon: const Icon(Icons.description_outlined),
+            tooltip: l10n.actionExportWord,
+            onPressed: _exportWord,
+          ).animate().fadeIn(delay: 300.ms).scale(),
+          IconButton(
             icon: const Icon(Icons.file_open_outlined),
             tooltip: l10n.actionOpen,
             onPressed: _pickFile,
@@ -539,7 +591,7 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                  color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
                   child: Text(
                     l10n.labelPath(currentFile.path!),
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -602,18 +654,18 @@ class _ViewerPageState extends State<ViewerPage> with TickerProviderStateMixin {
                           height: 1.6,
                         ),
                         blockquoteDecoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(8),
                           border: Border(
                             left: BorderSide(color: theme.colorScheme.primary, width: 4),
                           ),
                         ),
                         code: GoogleFonts.firaCode(
-                          backgroundColor: theme.colorScheme.surfaceVariant,
-                          color: theme.colorScheme.onSurfaceVariant,
+                          backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                          color: theme.colorScheme.onSurface,
                         ),
                         codeblockDecoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceVariant,
+                          color: theme.colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -699,7 +751,6 @@ class _CodeElementBuilder extends MarkdownElementBuilder {
     }
 
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     if (isMermaid) {
        try {
@@ -789,7 +840,7 @@ class _CodeElementBuilder extends MarkdownElementBuilder {
                              decoration: BoxDecoration(
                                color: theme.colorScheme.surface,
                                borderRadius: BorderRadius.circular(4),
-                               border: Border.all(color: theme.colorScheme.outline.withOpacity(0.3)),
+                               border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.3)),
                              ),
                              child: SelectableText(
                                unescapedCode,
@@ -837,9 +888,9 @@ class _CodeElementBuilder extends MarkdownElementBuilder {
             icon: const Icon(Icons.content_copy_rounded, size: 18),
             tooltip: 'Copy code',
             style: IconButton.styleFrom(
-              backgroundColor: theme.colorScheme.surface.withOpacity(0.5),
+              backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.5),
               foregroundColor: theme.colorScheme.primary,
-              hoverColor: theme.colorScheme.primary.withOpacity(0.1),
+              hoverColor: theme.colorScheme.primary.withValues(alpha: 0.1),
             ),
             onPressed: () {
               Clipboard.setData(ClipboardData(text: text));

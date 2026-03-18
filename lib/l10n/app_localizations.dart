@@ -122,6 +122,12 @@ abstract class AppLocalizations {
   /// **'Export PDF'**
   String get actionExport;
 
+  /// No description provided for @actionExportWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Word'**
+  String get actionExportWord;
+
   /// No description provided for @actionInfo.
   ///
   /// In en, this message translates to:
@@ -157,6 +163,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error exporting PDF: {error}'**
   String msgErrorExport(Object error);
+
+  /// No description provided for @msgErrorExportWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Error exporting Word document: {error}'**
+  String msgErrorExportWord(Object error);
 
   /// No description provided for @labelPath.
   ///

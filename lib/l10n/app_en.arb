@@ -2,6 +2,7 @@
     "appTitle": "MarkPress",
     "actionOpen": "Open Files",
     "actionExport": "Export PDF",
+    "actionExportWord": "Export Word",
     "actionInfo": "About",
     "actionLanguage": "Language",
     "tabWelcome": "Welcome",
@@ -19,6 +20,12 @@
     },
     "msgErrorExport": "Error exporting PDF: {error}",
     "@msgErrorExport": {
+        "placeholders": {
+            "error": {}
+        }
+    },
+    "msgErrorExportWord": "Error exporting Word document: {error}",
+    "@msgErrorExportWord": {
         "placeholders": {
             "error": {}
         }

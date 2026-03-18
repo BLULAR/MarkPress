@@ -18,6 +18,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get actionExport => 'PDF exportieren';
 
   @override
+  String get actionExportWord => 'Word exportieren';
+
+  @override
   String get actionInfo => 'Über';
 
   @override
@@ -39,6 +42,11 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String msgErrorExport(Object error) {
     return 'Fehler beim Exportieren: $error';
+  }
+
+  @override
+  String msgErrorExportWord(Object error) {
+    return 'Fehler beim Word-Export: $error';
   }
 
   @override
